@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 // eslint-disable-next-line
 import { Inter, Space_Grotesk } from "next/font/google";
@@ -49,15 +43,7 @@ export default function RootLayout({
             },
           }}
         >
-          <ThemeProvider>
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-            {children}
-          </ThemeProvider>
+          <ThemeProvider>{children}</ThemeProvider>
         </ClerkProvider>
       </body>
     </html>
