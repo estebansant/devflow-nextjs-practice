@@ -19,7 +19,7 @@ const LocalSearchBar = ({
 }: CustomInputProps) => {
   return (
     <div
-      className={`background-light800_darkgradient relative flex min-h-[56px] grow items-center gap-4 rounded-[10px] px-4 ${otherClasses}`}
+      className={`background-light800_darkgradient relative flex min-h-[56px] w-full grow items-center gap-4 rounded-[10px] px-4 ${otherClasses}`}
     >
       {iconPosition === "left" && (
         <Image
@@ -35,7 +35,7 @@ const LocalSearchBar = ({
         type="text"
         placeholder={placeholder}
         value=""
-        className="paragraph-regular no-focus placeholder background-light800_darkgradient border-none shadow-none outline-none"
+        className="paragraph-regular no-focus placeholder background-light800_darkgradient w-full border-none shadow-none outline-none"
         onChange={() => {}}
       />
 
