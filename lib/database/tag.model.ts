@@ -1,4 +1,4 @@
-import { Schema, models, model, Document } from "mongoose";
+import { Schema, model, models, Document } from "mongoose";
 
 export interface ITag extends Document {
   name: string;
