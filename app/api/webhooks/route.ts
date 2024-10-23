@@ -2,13 +2,12 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
-import { createUser, updateUser } from "@/lib/actions/user.action";
+import { createUser, updateUser, deleteUser } from "@/lib/actions/user.action";
 import { NextResponse } from "next/server";
-import { deleteUser } from "@/lib/actions/question.action";
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
-    const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+  const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
     throw new Error(
@@ -71,32 +70,34 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ message: "OK", user: mongoUser });
-  } 
-  
-  if (eventType === 'user.created') {
-    const { id, email_addresses, image_url, username, first_name, last_name } = evt.data;
-
-    // Create a new user in the database with a user action
-    const mongoUser = await updateUser({
-      clerkId: id,
-      updateData: {
-        name: `${first_name}${last_name ? ` ${last_name}` : ""}`,
-        username: username!,
-        email: email_addresses[0].email_address,
-        picture: image_url,
-      },
-      path: `/profile/${id}`,
-    });
-
-    if (eventType === "user.deleted") {
-        const { id } = evt.data;
-
-        const deletedUser = await deleteUser({
-            clerkId: id,
-        })
-
-    return NextResponse.json({ message: "OK", user: deletedUser });
   }
 
-  return new Response("", { status: 200 });
+  //   if (eventType === "user.created") {
+  //     const { id, email_addresses, image_url, username, first_name, last_name } =
+  //       evt.data;
+
+  //     // Create a new user in the database with a user action
+  //     const mongoUser = await updateUser({
+  //       clerkId: id,
+  //       updateData: {
+  //         name: `${first_name}${last_name ? ` ${last_name}` : ""}`,
+  //         username: username!,
+  //         email: email_addresses[0].email_address,
+  //         picture: image_url,
+  //       },
+  //       path: `/profile/${id}`,
+  //     });
+
+  //     if (eventType === "user.deleted") {
+  //       const { id } = evt.data;
+
+  //       const deletedUser = await deleteUser({
+  //         clerkId: id,
+  //       });
+
+  //       return NextResponse.json({ message: "OK", user: deletedUser });
+  //     }
+
+  //     return new Response("", { status: 200 });
+  //   }
 }
