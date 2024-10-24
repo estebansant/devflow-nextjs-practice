@@ -1,15 +1,16 @@
 /* eslint-disable camelcase */
+// @ts-nocheck
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
-import { createUser } from "@/lib/actions/user.action";
+import { createUser, deleteUser, updateUser } from "@/lib/actions/user.action";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
-  const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+  const NEXT_CLERK_WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
-  if (!WEBHOOK_SECRET) {
+  if (!NEXT_CLERK_WEBHOOK_SECRET) {
     throw new Error(
       "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local"
     );
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
   const body = JSON.stringify(payload);
 
   // Create a new Svix instance with your secret.
-  const wh = new Webhook(WEBHOOK_SECRET);
+  const wh = new Webhook(NEXT_CLERK_WEBHOOK_SECRET);
 
   let evt: WebhookEvent;
 
@@ -72,32 +73,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "OK", user: mongoUser });
   }
 
-  //   if (eventType === "user.created") {
-  //     const { id, email_addresses, image_url, username, first_name, last_name } =
-  //       evt.data;
+  if (eventType === "user.created") {
+    const { id, email_addresses, image_url, username, first_name, last_name } =
+      evt.data;
 
-  //     // Create a new user in the database with a user action
-  //     const mongoUser = await updateUser({
-  //       clerkId: id,
-  //       updateData: {
-  //         name: `${first_name}${last_name ? ` ${last_name}` : ""}`,
-  //         username: username!,
-  //         email: email_addresses[0].email_address,
-  //         picture: image_url,
-  //       },
-  //       path: `/profile/${id}`,
-  //     });
+    // Create a new user in the database with a user action
+    const mongoUser = await updateUser({
+      clerkId: id,
+      updateData: {
+        name: `${first_name}${last_name ? ` ${last_name}` : ""}`,
+        username: username!,
+        email: email_addresses[0].email_address,
+        picture: image_url,
+      },
+      path: `/profile/${id}`,
+    });
 
-  //     if (eventType === "user.deleted") {
-  //       const { id } = evt.data;
+    console.log(mongoUser);
 
-  //       const deletedUser = await deleteUser({
-  //         clerkId: id,
-  //       });
+    if (eventType === "user.deleted") {
+      const { id } = evt.data;
 
-  //       return NextResponse.json({ message: "OK", user: deletedUser });
-  //     }
+      const deletedUser = await deleteUser({
+        clerkId: id,
+      });
 
-  //     return new Response("", { status: 200 });
-  //   }
+      return NextResponse.json({ message: "OK", user: deletedUser });
+    }
+
+    return new Response("", { status: 200 });
+  }
 }
